@@ -153,13 +153,18 @@ func withRec(rec bool) cfunc {
 }
 func extracter(wg *sync.WaitGroup, ch <-chan string, content, rep string) {
 	for path := range ch {
+		//control the flow to avoid open too many files
 		go replace(wg, path, content, rep)
 	}
 }
 
 func replace(wg *sync.WaitGroup, src, content, replace string) {
-	defer wg.Done()
-
+	defer func() {
+		wg.Done()
+		<-bucket
+	}()
+	//control the flow
+	bucket <- struct{}{}
 	var once sync.Once
 	f, err := os.Open(src)
 	checkErr(err)

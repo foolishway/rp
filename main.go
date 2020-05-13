@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	bucket       chan struct{} = make(chan struct{}, 100)
 	src          []string
 	content, rep string
 	recursive    bool
