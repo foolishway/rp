@@ -27,7 +27,7 @@ type Replacer struct {
 
 type cfunc func(*Replacer)
 
-func newRepalcer(cfuncs ...cfunc) *Replacer {
+func newReplacer(cfuncs ...cfunc) *Replacer {
 	var wg sync.WaitGroup
 	defaultPaths := []string{"./"}
 	defaultExtents := map[string]struct{}{".go": {}, ".js": {}, ".jsx": {}, ".html": {}, ".txt": {}}

@@ -29,7 +29,7 @@ func main() {
 
 	start := time.Now()
 
-	replacer := newRepalcer(withPaths(src...), withContent(content), withRep(rep), withRec(recursive))
+	replacer := newReplacer(withPaths(src...), withContent(content), withRep(rep), withRec(recursive))
 	replacer.init()
 	replacer.start()
 
