@@ -56,6 +56,7 @@ func (r *Replacer) start() {
 	}
 	for _, path := range r.paths {
 		s, err := os.Stat(path)
+
 		if os.IsNotExist(err) {
 			log.Printf("%s not found", path)
 			continue
@@ -106,7 +107,21 @@ func (r *Replacer) start() {
 
 func withPaths(paths ...string) cfunc {
 	return func(replacer *Replacer) {
-		replacer.paths = append(replacer.paths, paths...)
+		var exist bool
+		for i := 0; i < len(paths); i++ {
+			for j := 0; j < len(replacer.paths); j++ {
+				if paths[i] == replacer.paths[j] {
+					exist = true
+					break
+				}
+			}
+			if !exist {
+				replacer.paths = append(replacer.paths, paths[i])
+			}
+		}
+		if len(replacer.paths) == 0 {
+			replacer.paths = []string{"./"}
+		}
 	}
 }
 func withExtents(exts ...string) cfunc {
