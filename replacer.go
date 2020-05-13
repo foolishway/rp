@@ -64,8 +64,11 @@ func (r *Replacer) start() {
 			if r.recursive {
 				filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
 					if !info.IsDir() {
-						if _, ok := r.extents[filepath.Ext(info.Name())]; ok {
-							dumper(p)
+						if _, ok := r.extents[filepath.Ext(p)]; ok {
+							absPath, err := filepath.Abs(p)
+
+							checkErr(err)
+							dumper(absPath)
 						}
 					}
 					return nil
@@ -78,14 +81,20 @@ func (r *Replacer) start() {
 				}
 
 				for _, f := range files {
-					if _, ok := r.extents[filepath.Ext(f.Name())]; ok {
-						dumper(filepath.Join(path, f.Name()))
+					if !f.IsDir() {
+						if _, ok := r.extents[filepath.Ext(f.Name())]; ok {
+							absPath, err := filepath.Abs(filepath.Join(path, f.Name()))
+							checkErr(err)
+							dumper(absPath)
+						}
 					}
 				}
 			}
 		} else {
 			if _, ok := r.extents[path]; ok {
-				dumper(path)
+				absPath, err := filepath.Abs(path)
+				checkErr(err)
+				dumper(absPath)
 			}
 		}
 	}
@@ -138,15 +147,10 @@ func replace(wg *sync.WaitGroup, src, content, replace string) {
 
 	var once sync.Once
 	f, err := os.Open(src)
-	defer f.Close()
-	if err != nil {
-		panic(fmt.Sprint("Open %s error: %v", err))
-	}
+	checkErr(err)
 
 	var bs bytes.Buffer
-	if err != nil {
-		panic(fmt.Sprintf("Create template file error %v", err))
-	}
+	checkErr(err)
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
@@ -154,30 +158,33 @@ func replace(wg *sync.WaitGroup, src, content, replace string) {
 		if strings.Contains(line, content) {
 			once.Do(func() {
 				atomic.AddInt32(&count, 1)
+				fmt.Printf("Replacing %s...\n", src)
 			})
-			fmt.Printf("Replacing %s...\n", src)
 			line = strings.Replace(line, content, replace, -1)
 		}
 		bs.WriteString(line + "\n")
 	}
 	if err := scanner.Err(); err != nil {
-		panic(fmt.Sprintf("Scan file %s error: %v", f.Name(), err))
+		panic(err)
 	}
+
+	f.Close()
 
 	//remove the source file
 	err = os.Remove(src)
-	if err != nil {
-		panic(fmt.Sprintf("Remove %s error: %v", src, err))
-	}
+	checkErr(err)
 
 	//copy template file
 	tf, err := os.Create(src)
-	if err != nil {
-		panic(fmt.Sprintf("Create %s error: %v", src, err))
-	}
+	checkErr(err)
+
 	defer tf.Close()
 	_, err = io.Copy(tf, &bs)
+	checkErr(err)
+}
+
+func checkErr(err error) {
 	if err != nil {
-		panic(fmt.Sprintf("Copy %s error: %v", src, err))
+		panic(err)
 	}
 }

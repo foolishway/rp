@@ -20,10 +20,6 @@ func main() {
 	flag.BoolVar(&recursive, "rec", false, "Allow repalce recursivly.")
 
 	flag.Parse()
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		return
-	}
 
 	src = flag.Args()
 
