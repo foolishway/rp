@@ -29,7 +29,7 @@ type cfunc func(*Replacer)
 
 func newReplacer(cfuncs ...cfunc) *Replacer {
 	var wg sync.WaitGroup
-	defaultPaths := []string{"./"}
+	defaultPaths := []string{}
 	defaultExtents := map[string]struct{}{".go": {}, ".js": {}, ".jsx": {}, ".html": {}, ".txt": {}}
 	ch := make(chan string, 10)
 	replace := &Replacer{wg: wg, paths: defaultPaths, extents: defaultExtents, ch: ch}
@@ -92,7 +92,7 @@ func (r *Replacer) start() {
 				}
 			}
 		} else {
-			if _, ok := r.extents[path]; ok {
+			if _, ok := r.extents[filepath.Ext(path)]; ok {
 				absPath, err := filepath.Abs(path)
 				checkErr(err)
 				dumper(absPath)
