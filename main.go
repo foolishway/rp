@@ -26,7 +26,7 @@ func main() {
 
 	start := time.Now()
 
-	options := []cfunc{}
+	options := []option{}
 	if len(src) != 0 {
 		options = append(options, withPaths(src...))
 	}

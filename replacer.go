@@ -25,15 +25,15 @@ type Replacer struct {
 	ch        chan string
 }
 
-type cfunc func(*Replacer)
+type option func(*Replacer)
 
-func newReplacer(cfuncs ...cfunc) *Replacer {
+func newReplacer(options ...option) *Replacer {
 	var wg sync.WaitGroup
 	defaultPaths := []string{"./"}
 	defaultExtents := map[string]struct{}{".go": {}, ".js": {}, ".jsx": {}, ".html": {}, ".txt": {}}
 	ch := make(chan string, 10)
 	replace := &Replacer{wg: wg, paths: defaultPaths, extents: defaultExtents, ch: ch}
-	for _, f := range cfuncs {
+	for _, f := range options {
 		f(replace)
 	}
 	return replace
@@ -105,7 +105,7 @@ func (r *Replacer) start() {
 	close(r.ch)
 }
 
-func withPaths(paths ...string) cfunc {
+func withPaths(paths ...string) option {
 	return func(replacer *Replacer) {
 		//remove default paths
 		replacer.paths = []string{}
@@ -126,7 +126,7 @@ func withPaths(paths ...string) cfunc {
 		}
 	}
 }
-func withExtents(exts ...string) cfunc {
+func withExtents(exts ...string) option {
 	return func(replacer *Replacer) {
 		for _, ext := range exts {
 			if _, ok := replacer.extents[ext]; !ok {
@@ -136,19 +136,19 @@ func withExtents(exts ...string) cfunc {
 	}
 }
 
-func withContent(content string) cfunc {
+func withContent(content string) option {
 	return func(replace *Replacer) {
 		replace.content = content
 	}
 }
 
-func withRep(rep string) cfunc {
+func withRep(rep string) option {
 	return func(replace *Replacer) {
 		replace.replace = rep
 	}
 }
 
-func withRec(rec bool) cfunc {
+func withRec(rec bool) option {
 	return func(replace *Replacer) {
 		replace.recursive = rec
 	}
