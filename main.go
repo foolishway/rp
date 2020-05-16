@@ -26,7 +26,23 @@ func main() {
 
 	start := time.Now()
 
-	replacer := newReplacer(withPaths(src...), withContent(content), withRep(rep), withRec(recursive))
+	options := []cfunc{}
+	if len(src) != 0 {
+		options = append(options, withPaths(src...))
+	}
+
+	if content != "" {
+		options = append(options, withContent(content))
+	}
+
+	if rep != "" {
+		options = append(options, withContent(rep))
+	}
+
+	if recursive {
+		options = append(options, withRec(recursive))
+	}
+	replacer := newReplacer(options...)
 	replacer.init()
 	replacer.start()
 

@@ -29,7 +29,7 @@ type cfunc func(*Replacer)
 
 func newReplacer(cfuncs ...cfunc) *Replacer {
 	var wg sync.WaitGroup
-	defaultPaths := []string{}
+	defaultPaths := []string{"./"}
 	defaultExtents := map[string]struct{}{".go": {}, ".js": {}, ".jsx": {}, ".html": {}, ".txt": {}}
 	ch := make(chan string, 10)
 	replace := &Replacer{wg: wg, paths: defaultPaths, extents: defaultExtents, ch: ch}
@@ -107,6 +107,8 @@ func (r *Replacer) start() {
 
 func withPaths(paths ...string) cfunc {
 	return func(replacer *Replacer) {
+		//remove default paths
+		replacer.paths = []string{}
 		var exist bool
 		for i := 0; i < len(paths); i++ {
 			for j := 0; j < len(replacer.paths); j++ {
