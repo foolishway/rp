@@ -36,7 +36,7 @@ func main() {
 	}
 
 	if rep != "" {
-		options = append(options, withContent(rep))
+		options = append(options, withRep(rep))
 	}
 
 	if recursive {
