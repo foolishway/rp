@@ -196,7 +196,7 @@ func replace(wg *sync.WaitGroup, src, content, replace string) {
 	err = os.Remove(src)
 	checkErr(err)
 
-	//copy template file
+	//create new file
 	tf, err := os.Create(src)
 	checkErr(err)
 
