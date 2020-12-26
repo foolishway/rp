@@ -12,15 +12,20 @@ var (
 	content, rep string
 	recursive    bool
 	count        int32
-	extents      []string = []string{".txt", ".go", ".html", ".js", ".css"}
+	extents      []string = []string{".txt", ".go", ".html", ".js", ".css", ".vue", ".ts"}
 )
 
 func main() {
 	flag.StringVar(&content, "con", "", "The content to be replaced.")
-	flag.StringVar(&rep, "rep", "", "The content to replace.")
+	flag.StringVar(&rep, "rep", "", "The new content to replace.")
 	flag.BoolVar(&recursive, "rec", false, "Allow repalce recursivly.")
 
 	flag.Parse()
+
+	if content == "" || rep == "" {
+		flag.Usage()
+		return
+	}
 
 	src = flag.Args()
 

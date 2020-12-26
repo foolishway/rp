@@ -1,5 +1,5 @@
 #!/bin/bash
 
-go build -o rp *.go 
+GOOS=darwin go build -o rp *.go 
 cp rp $GOPATH/bin
 rm ./rp
